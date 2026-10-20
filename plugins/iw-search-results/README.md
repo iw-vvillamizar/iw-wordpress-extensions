@@ -2,97 +2,164 @@
 
 ## Estado
 
-Plugin WordPress/WooCommerce en evolución activa. Versión documentada: `1.3.0`.
+Plugin WordPress/WooCommerce en evolución activa. Versión documentada: `1.4.2`.
 
 ## Identificación
 
 - Nombre: **IW Search Results**
-- Versión: `1.3.0`
+- Versión: `1.4.2`
 - Autor: IngeWeb.co
 - Requiere WordPress: `6.0+`
 - Requiere PHP: `7.4+`
 - Requiere WooCommerce
-- Paquete instalable: [iw-search-results-v1.3.0.zip](../../dist/iw-search-results-v1.3.0.zip)
+- Paquete instalable: [iw-search-results-v1.4.2.zip](../../dist/iw-search-results-v1.4.2.zip)
 
 ## Función
 
-Unifica tres necesidades:
+El plugin reúne cuatro flujos:
 
-1. Resultados de búsqueda global separados entre productos y contenido.
-2. Catálogo visual de WooCommerce con filtros por categoría y paginación.
-3. Buscador exclusivo de productos que puede permanecer en la misma URL donde se inserta.
+1. Búsqueda global de WordPress.
+2. Catálogo visual de productos WooCommerce.
+3. Búsqueda exclusiva de productos.
+4. Búsqueda exclusiva de entradas del blog.
 
-El buscador de productos puede incluir opcionalmente las características guardadas en `_iw_product_features`, utilizadas por **IW Product Features**.
+La búsqueda de productos puede incluir opcionalmente las características guardadas en `_iw_product_features`, utilizadas por **IW Product Features**.
 
-## Shortcodes
+## Shortcodes principales
 
 ### Búsqueda global
 
 ```text
-[iw_search_results]
 [iw_search_form]
+[iw_search_results]
 ```
 
-Para incluir características de producto:
+Opcionalmente puede incluir características de producto:
 
 ```text
 [iw_search_results include_features="yes"]
 ```
 
-### Catálogo
+### Productos
 
-```text
-[iw_product_catalog]
-```
-
-Incluye filtros por categoría, paginación y soporte para búsqueda exclusiva de productos. La categoría mostrada sobre el título de cada producto es clicable y abre el catálogo filtrado por esa categoría.
-
-### Buscador exclusivo de productos
-
-Solo título y SKU:
+Formulario:
 
 ```text
 [iw_product_search_form]
 ```
 
-Título, SKU y características:
+Catálogo/resultados:
 
 ```text
-[iw_product_search_form include_features="yes"]
-```
-
-Para mostrar resultados en la misma página:
-
-```text
-[iw_product_search_form include_features="yes"]
 [iw_product_catalog]
 ```
 
-También existe el shortcode combinado:
+Combinado:
 
 ```text
-[iw_product_search include_features="yes" per_page="12" columns="4" categories="yes"]
+[iw_product_search]
 ```
 
-## Filtro por categorías en la búsqueda de productos
+Para incluir características:
 
-Desde la versión 1.3.0, `[iw_product_search_form]` incluye un selector desplegable de categorías WooCommerce:
+```text
+[iw_product_search include_features="yes"]
+```
+
+### Blog
+
+Formulario:
+
+```text
+[iw_blog_search_form]
+```
+
+Resultados:
+
+```text
+[iw_blog_results]
+```
+
+Combinado:
+
+```text
+[iw_blog_search]
+```
+
+La búsqueda del blog trabaja exclusivamente con `post_type = post` y mantiene la búsqueda en la misma página.
+
+## Categorías
+
+### Productos
+
+El formulario de productos permite un dropdown con selección múltiple de categorías WooCommerce.
 
 - **Todas las categorías** queda seleccionada por defecto.
-- El usuario puede seleccionar una o varias categorías mediante checkboxes.
-- Solo se listan categorías con productos publicados.
-- Si no hay categorías con productos, el selector no se muestra.
-- La búsqueda combina término + categorías seleccionadas + SKU + características opcionales.
+- Solo se muestran categorías con productos publicados.
+- Si no existen categorías disponibles, el selector se oculta.
+- La categoría mostrada en cada card del catálogo es clicable y filtra el catálogo en la misma pantalla.
 
-Para ocultar el selector:
+### Blog
+
+El formulario del blog también permite seleccionar una o varias categorías mediante checkboxes.
+
+- Solo se muestran categorías con posts publicados.
+- Si no existen categorías disponibles, el selector se oculta.
+- En los resultados del blog, `.iw-search-card__meta` muestra la categoría real del artículo.
+- La categoría es clicable y filtra `[iw_blog_results]` en la misma pantalla conservando el término de búsqueda.
+
+## Exclusión de categorías por ID
+
+Desde la versión 1.4.2 puede utilizarse:
 
 ```text
-[iw_product_search_form category_selector="no"]
+exclude_categories="12,18,25"
 ```
+
+### Blog
+
+```text
+[iw_blog_search_form exclude_categories="12,18,25"]
+[iw_blog_results exclude_categories="12,18,25"]
+```
+
+O con el shortcode combinado:
+
+```text
+[iw_blog_search exclude_categories="12,18,25" per_page="9" columns="3"]
+```
+
+Las categorías excluidas:
+
+- no aparecen en el selector;
+- no pueden seleccionarse;
+- sus posts quedan fuera de los resultados;
+- si se excluye una categoría padre, también se excluyen sus descendientes.
+
+### Productos
+
+```text
+[iw_product_search_form exclude_categories="7,14"]
+[iw_product_catalog exclude_categories="7,14"]
+```
+
+O combinado:
+
+```text
+[iw_product_search exclude_categories="7,14" include_features="yes" per_page="12" columns="4"]
+```
+
+La exclusión se aplica a:
+
+- dropdown de categorías;
+- filtros superiores del catálogo;
+- resultados del catálogo;
+- resultados del buscador exclusivo de productos;
+- subcategorías descendientes de las categorías excluidas.
 
 ## Integración con Divi
 
-Los formularios conservan las clases principales del módulo de búsqueda de Divi:
+Los formularios mantienen las clases principales del módulo de búsqueda de Divi:
 
 - `et_pb_module`
 - `et_pb_search`
@@ -100,25 +167,38 @@ Los formularios conservan las clases principales del módulo de búsqueda de Div
 - `et_pb_s`
 - `et_pb_searchsubmit`
 
-El formulario global conserva el comportamiento estándar de WordPress/Divi; el formulario exclusivo de productos utiliza `iw_product_search` y mantiene la búsqueda en la misma página.
+Esto permite reutilizar los estilos existentes del proyecto.
 
-## Diseño
+## Novedades recientes
 
-Las tarjetas de búsqueda y catálogo comparten la misma estructura visual. El CSS consume las variables globales del proyecto (`--color-primary`, `--color-accent`, `--font-heading`, `--border-radius-card`, etc.) para integrarse con la identidad visual existente.
+### 1.4.2
 
-## Novedades 1.3.0
+- Nuevo atributo `exclude_categories` para blog y productos.
+- Exclusión por uno o varios IDs separados por coma.
+- Las categorías excluidas desaparecen de formularios, filtros y resultados.
+- La exclusión incluye categorías descendientes.
 
-- Categoría clicable en las cards del catálogo.
-- Dropdown de categorías en `[iw_product_search_form]`.
-- Selección múltiple de categorías mediante checkboxes.
+### 1.4.1
+
+- Los resultados del blog muestran la categoría real en `.iw-search-card__meta`.
+- La categoría es clicable y filtra en la misma página.
+- En búsqueda global, los posts también muestran su categoría real.
+
+### 1.4.0
+
+- Añadidos `[iw_blog_search_form]`, `[iw_blog_results]` y `[iw_blog_search]`.
+- Búsqueda exclusiva de posts.
+- Filtro múltiple por categorías del blog.
+
+### 1.3.0
+
+- Categoría clicable en cards de producto.
+- Dropdown múltiple de categorías en el buscador de productos.
 - Solo categorías con productos publicados.
-- Ocultación automática del selector si no hay categorías disponibles.
-- Filtrado combinado por término, categorías y características opcionales.
-- El shortcode `[iw_product_search]` hereda el mismo selector.
 
 ## Instalación
 
-1. Descarga [iw-search-results-v1.3.0.zip](../../dist/iw-search-results-v1.3.0.zip).
+1. Descarga [iw-search-results-v1.4.2.zip](../../dist/iw-search-results-v1.4.2.zip).
 2. Instálalo desde **Plugins → Añadir nuevo → Subir plugin**.
 3. Actívalo.
 4. Inserta los shortcodes requeridos desde Divi o el editor de WordPress.
